@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard";
 import AssemblyUnits from "./pages/AssemblyUnits";
 import Batches from "./pages/Batches";
 import WorkOrders from "./pages/WorkOrders";
+import BillOfMaterials from "./pages/BillOfMaterials";
 import NotFound from "./pages/NotFound";
 import RawMaterialScanForm from "./components/form/RawMaterialScanForm";
 import RMCheck from "./pages/RMCheck";
@@ -26,7 +27,7 @@ const App = () => (
           <Route path="/work-orders" element={<WorkOrders />} />
           <Route path="/raw-materials" element={<RMCheck />} />
           <Route path="/stations" element={<Dashboard />} />
-          <Route path="/bill-of-materials" element={<Dashboard />} />
+          <Route path="/bill-of-materials" element={<BillOfMaterials />} />
           <Route path="/process-steps" element={<Dashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -41,17 +41,17 @@ export default function BatchesPage() {
 
   const columns = [
     {
-      key: 'batchNumber',
+      key: 'batchNo',
       header: 'Batch Number',
       accessor: (item: Batch) => (
-        <span className="font-mono font-semibold">{item.batchNumber}</span>
+        <span className="font-mono font-semibold">{item.batchNo}</span>
       ),
     },
     {
-      key: 'workOrder',
-      header: 'Work Order',
+      key: 'productCode',
+      header: 'Product Code',
       accessor: (item: Batch) => (
-        <span className="text-sm">{item.workOrderId}</span>
+        <span className="text-sm">{item.productCode}</span>
       ),
     },
     {
@@ -60,19 +60,13 @@ export default function BatchesPage() {
       accessor: (item: Batch) => <StatusBadge status={item.status} />,
     },
     {
-      key: 'progress',
-      header: 'Progress',
-      accessor: (item: Batch) => {
-        const percentage = (item.actualQuantity / item.plannedQuantity) * 100;
-        return (
-          <div className="w-32 space-y-1">
-            <Progress value={percentage} className="h-2" />
-            <p className="text-xs text-muted-foreground">
-              {item.actualQuantity}/{item.plannedQuantity} units
-            </p>
-          </div>
-        );
-      },
+      key: 'description',
+      header: 'Description',
+      accessor: (item: Batch) => (
+        <span className="text-sm text-muted-foreground">
+          {item.description || '-'}
+        </span>
+      ),
     },
     {
       key: 'dates',
@@ -126,7 +120,7 @@ export default function BatchesPage() {
           </Button>
         </div>
 
-        {/* <div className="bg-card rounded-lg border shadow-sm">
+        <div className="bg-card rounded-lg border shadow-sm">
           <DataTable
             data={data?.data || []}
             columns={columns}
@@ -139,9 +133,9 @@ export default function BatchesPage() {
             totalItems={data?.total || 0}
             isLoading={isLoading}
           />
-        </div> */}
+        </div>
 
-        {/* <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -160,7 +154,7 @@ export default function BatchesPage() {
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
-        </AlertDialog> */}
+        </AlertDialog>
       </div>
     </Layout>
   );
