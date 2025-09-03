@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -462,7 +463,7 @@ export default function BillOfMaterials() {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <FormLabel>Material Code</FormLabel>
+                  <Label>Material Code</Label>
                   <Input
                     value={editingItem.materialCode}
                     onChange={(e) =>
@@ -472,7 +473,7 @@ export default function BillOfMaterials() {
                   />
                 </div>
                 <div>
-                  <FormLabel>Material Name</FormLabel>
+                  <Label>Material Name</Label>
                   <Input
                     value={editingItem.materialName}
                     onChange={(e) =>
@@ -483,7 +484,7 @@ export default function BillOfMaterials() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <FormLabel>Required Quantity</FormLabel>
+                    <Label>Required Quantity</Label>
                     <Input
                       type="number"
                       value={editingItem.requiredQty}
@@ -499,7 +500,7 @@ export default function BillOfMaterials() {
                     />
                   </div>
                   <div>
-                    <FormLabel>Unit</FormLabel>
+                    <Label>Unit</Label>
                     <Input
                       value={editingItem.unit || ''}
                       onChange={(e) =>
@@ -510,7 +511,7 @@ export default function BillOfMaterials() {
                   </div>
                 </div>
                 <div>
-                  <FormLabel>Specification (Optional)</FormLabel>
+                  <Label>Specification (Optional)</Label>
                   <Input
                     value={editingItem.specification || ''}
                     onChange={(e) =>
