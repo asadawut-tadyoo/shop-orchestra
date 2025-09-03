@@ -52,7 +52,7 @@ export default function WorkOrdersPage() {
       key: 'orderNumber',
       header: 'Order Number',
       accessor: (item: WorkOrder) => (
-        <span className="font-mono font-semibold">{item.orderNumber}</span>
+        <span className="font-mono font-semibold">{item.workOrderNo}</span>
       ),
     },
     {

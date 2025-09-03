@@ -126,7 +126,7 @@ export default function BatchesPage() {
           </Button>
         </div>
 
-        <div className="bg-card rounded-lg border shadow-sm">
+        {/* <div className="bg-card rounded-lg border shadow-sm">
           <DataTable
             data={data?.data || []}
             columns={columns}
@@ -139,9 +139,9 @@ export default function BatchesPage() {
             totalItems={data?.total || 0}
             isLoading={isLoading}
           />
-        </div>
+        </div> */}
 
-        <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        {/* <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -160,7 +160,7 @@ export default function BatchesPage() {
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
-        </AlertDialog>
+        </AlertDialog> */}
       </div>
     </Layout>
   );

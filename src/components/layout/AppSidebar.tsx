@@ -33,6 +33,11 @@ const navigation = [
     title: 'Assembly Units',
     href: '/assembly-units',
     icon: Package,
+  }, 
+  {
+    title: 'RMCheck',
+    href: '/raw-materials',
+    icon: Box,
   },
   {
     title: 'Batches',
@@ -43,11 +48,6 @@ const navigation = [
     title: 'Work Orders',
     href: '/work-orders',
     icon: ClipboardList,
-  },
-  {
-    title: 'Raw Materials',
-    href: '/raw-materials',
-    icon: Box,
   },
   {
     title: 'Stations',

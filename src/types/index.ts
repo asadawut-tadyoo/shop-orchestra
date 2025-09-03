@@ -105,11 +105,12 @@ export interface AssemblyUnit {
 
 export interface Batch {
   id: string;
-  batchNumber: string;
-  workOrderId: string;
+  batchNo: string;
+  productCode:string; 
   status: BatchStatus;
-  plannedQuantity: number;
-  actualQuantity: number;
+  // workOrder: WorkOrder;
+  // plannedQuantity: number;
+  // actualQuantity: number;
   startDate?: Date;
   endDate?: Date;
   description?: string;
@@ -119,28 +120,28 @@ export interface BillOfMaterials {
   id: string;
   productCode: string;
   productName: string;
-  version: string;
-  materials: BOMItem[];
-  isActive: boolean;
-  createdAt: Date;
+  revision: string;
+  bomItems: BOMItem[];
+  isActive?: boolean;
+  createdAt?: Date;
   updatedAt: Date;
 }
 
 export interface BOMItem {
   materialCode: string;
   materialName: string;
-  quantity: number;
-  unit: string;
+  requiredQty: number;
+  unit?: string;
   specification?: string;
 }
 
 export interface Station {
   id: string;
-  code: string;
+  code?: string;
   name: string;
-  type: StationType;
+  stationType: StationType;
   location: string;
-  isActive: boolean;
+  isActive?: boolean;
   capacity?: number;
   currentLoad?: number;
   description?: string;
@@ -148,14 +149,15 @@ export interface Station {
 
 export interface WorkOrder {
   id: string;
-  orderNumber: string;
+  workOrderNo: string;
   productCode: string;
   productName: string;
+  bomId:string;
   quantity: number;
   status: WorkOrderStatus;
-  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
+  priority?: 'Low' | 'Medium' | 'High' | 'Urgent';
   startDate: Date;
-  dueDate: Date;
+  dueDate?: Date;
   completedQuantity?: number;
   customer?: string;
   notes?: string;

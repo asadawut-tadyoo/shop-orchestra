@@ -6,7 +6,7 @@ import {
   QueryParams 
 } from '@/types';
 
-const BASE_PATH = '/assembly-units';
+const BASE_PATH = '/AssemblyUnits';
 
 export const assemblyUnitsService = {
   // Get all assembly units with pagination

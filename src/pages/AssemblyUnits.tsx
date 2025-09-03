@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/alert-dialog';
 
 export default function AssemblyUnitsPage() {
+  // const dataTable_temp = DataTable<string>()
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
