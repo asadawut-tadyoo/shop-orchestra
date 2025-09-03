@@ -49,4 +49,23 @@ export const assemblyUnitsService = {
     const { data } = await api.get(`${BASE_PATH}/batch/${batchId}`);
     return data;
   },
+
+  // Get assembly unit by serial number
+  getBySerial: async (productCode: string, serialNumber: string): Promise<AssemblyUnit> => {
+    const { data } = await api.get(`${BASE_PATH}/by-serial/${productCode}/${serialNumber}`);
+    return data;
+  },
+
+  // Consume raw material
+  consumeRawMaterial: async (id: string, materialCode: string, serialNumber: string): Promise<void> => {
+    await api.post(`${BASE_PATH}/${id}/consume-rawmaterial`, {
+      materialCode,
+      serialNumber
+    });
+  },
+
+  // Change assembly unit status
+  changeStatus: async (id: string, status: string): Promise<void> => {
+    await api.post(`${BASE_PATH}/${id}/change-status`, { status });
+  },
 };

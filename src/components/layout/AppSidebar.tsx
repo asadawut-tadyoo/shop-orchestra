@@ -35,7 +35,7 @@ const navigation = [
     icon: Package,
   }, 
   {
-    title: 'RMCheck',
+    title: 'Raw Material Check',
     href: '/raw-materials',
     icon: Box,
   },

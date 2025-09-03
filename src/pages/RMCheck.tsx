@@ -1,188 +1,97 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
-import { useRawMaterials } from "@/hooks/useApi";
 import BarcodeForm from "@/components/form/BarcodeForm";
-import axios from "axios";
 import RawMaterialScanForm from "@/components/form/RawMaterialScanForm";
-import { AssemblyUnit, AssemblyUnitStatus, RawMaterialStatus } from "@/types";
+import { AssemblyUnit, AssemblyUnitStatus } from "@/types";
 import { assemblyUnitsService } from "@/services/assemblyUnits";
 import { Card } from "@/components/ui/card";
+import { toast } from "sonner";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
 
 export default function RMCheckForm() {
   const [barcode, setBarcode] = useState<string>("");
-  const [showCustomerBarcode, setShowCustomerBarcode] =
-    useState<boolean>(false);
+  const [showRawMaterialScan, setShowRawMaterialScan] = useState<boolean>(false);
   const [assemblyUnit, setAssemblyUnit] = useState<AssemblyUnit | null>(null);
+  const [alertMessage, setAlertMessage] = useState<string>("");
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
   const resetState = () => {
     setBarcode("");
-    setShowCustomerBarcode(false);
+    setShowRawMaterialScan(false);
+    setAssemblyUnit(null);
   };
-  // const response: AssemblyUnit = {
-  //       id: "AU-001",
-  //       serialNumber: "SN-20250902-001",
-  //       productCode: "PC-12345",
-  //       workOrderId: "WO-20250902",
-  //       batchId: "BATCH-009",
-  //       stationId: "ST-05",
-  //       status: AssemblyUnitStatus.InProgress,
-  //       rawMaterials: [
-  //         {
-  //           id: "RM-001",
-  //           code: "MAT-1001",
-  //           serialNumber: "RM-SN-001",
-  //           lotNumber: "LOT-2025-01",
-  //           batchNo: "BATCH-RM-01",
-  //           status: RawMaterialStatus.Created,
-  //           inspections: [
-  //             {
-  //               id: "INSP-001",
-  //               assemblyUnitId: "AU-001",
-  //               rawMaterialId: "RM-001",
-  //               targetType: "Material",
-  //               targetId: "MAT-1001",
-  //               testType: "Visual",
-  //               result: "Pass",
-  //               measuredValue: "N/A",
-  //               inspector: "John Doe",
-  //               timestamp: new Date("2025-09-01T08:00:00Z"),
-  //             },
-  //           ],
-  //           description: "Main PCB Board",
-  //           quantity: 10,
-  //           unit: "pcs",
-  //           supplier: "ABC Electronics",
-  //           receivedDate: new Date("2025-08-28T10:00:00Z"),
-  //         },
-  //         {
-  //           id: "RM-002",
-  //           code: "MAT-1001",
-  //           serialNumber: "RM-SN-002",
-  //           lotNumber: "LOT-2025-01",
-  //           batchNo: "BATCH-RM-01",
-  //           status: RawMaterialStatus.Created,
-  //           inspections: [
-  //             {
-  //               id: "INSP-001",
-  //               assemblyUnitId: "AU-001",
-  //               rawMaterialId: "RM-001",
-  //               targetType: "Material",
-  //               targetId: "MAT-1001",
-  //               testType: "Visual",
-  //               result: "Pass",
-  //               measuredValue: "N/A",
-  //               inspector: "John Doe",
-  //               timestamp: new Date("2025-09-01T08:00:00Z"),
-  //             },
-  //           ],
-  //           description: "Main PCB Board",
-  //           quantity: 10,
-  //           unit: "pcs",
-  //           supplier: "ABC Electronics",
-  //           receivedDate: new Date("2025-08-28T10:00:00Z"),
-  //         },
-  //         {
-  //           id: "RM-003",
-  //           code: "MAT-1001",
-  //           serialNumber: "RM-SN-003",
-  //           lotNumber: "LOT-2025-01",
-  //           batchNo: "BATCH-RM-01",
-  //           status: RawMaterialStatus.Created,
-  //           inspections: [
-  //             {
-  //               id: "INSP-001",
-  //               assemblyUnitId: "AU-001",
-  //               rawMaterialId: "RM-001",
-  //               targetType: "Material",
-  //               targetId: "MAT-1001",
-  //               testType: "Visual",
-  //               result: "Pass",
-  //               measuredValue: "N/A",
-  //               inspector: "John Doe",
-  //               timestamp: new Date("2025-09-01T08:00:00Z"),
-  //             },
-  //           ],
-  //           description: "Main PCB Board",
-  //           quantity: 10,
-  //           unit: "pcs",
-  //           supplier: "ABC Electronics",
-  //           receivedDate: new Date("2025-08-28T10:00:00Z"),
-  //         },
-  //       ],
-  //       steps: [
-  //         {
-  //           id: "STEP-001",
-  //           name: "Assembly",
-  //           stationId: "ST-01",
-  //           assemblyUnitId: "AU-001",
-  //           startTime: new Date("2025-09-01T09:00:00Z"),
-  //           endTime: new Date("2025-09-01T09:30:00Z"),
-  //           duration: "30m",
-  //         },
-  //         {
-  //           id: "STEP-002",
-  //           name: "Testing",
-  //           stationId: "ST-02",
-  //           assemblyUnitId: "AU-001",
-  //           startTime: new Date("2025-09-01T10:00:00Z"),
-  //           // endTime, duration optional
-  //         },
-  //       ],
-  //       inspections: [
-  //         {
-  //           id: "INSP-002",
-  //           assemblyUnitId: "AU-001",
-  //           targetType: "Assembly",
-  //           targetId: "AU-001",
-  //           testType: "Electrical",
-  //           result: "Pass",
-  //           measuredValue: "12V",
-  //           inspector: "Jane Smith",
-  //           timestamp: new Date("2025-09-01T11:00:00Z"),
-  //         },
-  //       ],
-  //       usages: [
-  //         {
-  //           materialCode: "MAT-1001",
-  //           serialNumber: "RM-SN-001",
-  //           usedAt: new Date("2025-09-01T09:15:00Z"),
-  //         },
-  //       ],
-  //       createdAt: new Date("2025-08-31T15:00:00Z"),
-  //       updatedAt: new Date("2025-09-01T12:00:00Z"),
-  //     };
-  const handleSummitCusCode = async (barcode: string) => {
-    // axios
-    //   .post("/api/endpoint", { barcode })
-    //   .then((response) => {
-    //     console.log("Response:", response.data);
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error:", error);
-    //   });
-    try {
-      const response = await axios.get(
-        `http://localhost:5068/api/AssemblyUnits/${barcode}`
-      );
 
-      console.log("Response:", response);
-      const assemblyUnit = response.data;
+  const handleSummitCusCode = async (barcode: string) => {
+    try {
+      // Parse QR Code format: ProductCode:SerialNumber
+      const [productCode, serialNumber] = barcode.split(':');
+      
+      if (!productCode || !serialNumber) {
+        setAlertMessage("Invalid QR Code format. Expected format: ProductCode:SerialNumber");
+        setShowAlert(true);
+        resetState();
+        return;
+      }
+
+      // Get assembly unit by serial number
+      const assemblyUnit = await assemblyUnitsService.getBySerial(productCode, serialNumber);
+      
+      // Check assembly unit status
+      if (assemblyUnit.status !== AssemblyUnitStatus.Created) {
+        if (assemblyUnit.status === AssemblyUnitStatus.Assembled) {
+          setAlertMessage("This assembly unit has already been assembled. All raw materials have been consumed.");
+        } else {
+          setAlertMessage(`Invalid assembly unit status: ${assemblyUnit.status}. Only units with status 'Created' can proceed.`);
+        }
+        setShowAlert(true);
+        resetState();
+        return;
+      }
+
+      // Check if all raw materials are already consumed
+      const allConsumed = assemblyUnit.rawMaterials.every(
+        rm => rm.status === 'Consumed'
+      );
+      
+      if (allConsumed) {
+        setAlertMessage("All raw materials have already been consumed for this assembly unit.");
+        setShowAlert(true);
+        resetState();
+        return;
+      }
+
+      // If validation passes, proceed to raw material scanning
       setAssemblyUnit(assemblyUnit);
-      setShowCustomerBarcode(true);
-    } catch (error) {
-      console.log("Error:", error.toJSON());
+      setShowRawMaterialScan(true);
+      toast.success("Assembly unit validated. Please scan raw materials.");
+      
+    } catch (error: any) {
+      console.error("Error fetching assembly unit:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch assembly unit");
+      resetState();
     }
   };
 
-  const handleSummitMatCode = (barcode: string) => {
-    axios
-      .post("/api/endpoint", { barcode })
-      .then((response) => {
-        console.log("Response:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+  const handleRawMaterialProcessed = () => {
+    // Check if all raw materials are consumed
+    if (assemblyUnit) {
+      const allConsumed = assemblyUnit.rawMaterials.every(
+        rm => rm.status === 'Consumed'
+      );
+      
+      if (allConsumed) {
+        setAlertMessage("All raw materials have been successfully consumed. Assembly unit is complete!");
+        setShowAlert(true);
+        resetState();
+      }
+    }
   };
 
   return (
@@ -192,7 +101,7 @@ export default function RMCheckForm() {
         <div>
           <h1 className="text-3xl font-bold">Raw Material Check</h1>
           <p className="text-muted-foreground mt-1">
-            {/* Real-time overview of production activities */}
+            Scan customer barcode to begin raw material consumption process
           </p>
         </div>
 
@@ -201,22 +110,37 @@ export default function RMCheckForm() {
             <div className="p-0 ">
               <div className="flex items-center justify-between">
               </div>
-              {!showCustomerBarcode ? (
+              {!showRawMaterialScan ? (
                 <BarcodeForm
-                  label="Scan Customer Code"
+                  label="Scan Customer Code (ProductCode:SerialNumber)"
                   onSubmit={handleSummitCusCode}
-                ></BarcodeForm>
+                />
               ) : (
                 <RawMaterialScanForm
-                  assemblyUnit={assemblyUnit}
-                  onSubmit={handleSummitMatCode}
-                  onAccept={resetState}
-                ></RawMaterialScanForm>
+                  assemblyUnit={assemblyUnit!}
+                  onSubmit={() => {}}
+                  onAccept={handleRawMaterialProcessed}
+                />
               )}
             </div>
           </Card>
         </div>
       </div>
+
+      {/* Alert Dialog */}
+      <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>System Alert</AlertDialogTitle>
+            <AlertDialogDescription>
+              {alertMessage}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogAction onClick={() => setShowAlert(false)}>
+            OK
+          </AlertDialogAction>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 }
