@@ -22,7 +22,7 @@ import {
   ProcessStep,
   QueryParams,
   PaginatedResponse 
-} from '@/types/index_BK';
+} from '@/types/index';
 
 // Assembly Units Hooks
 export const useAssemblyUnits = (params?: QueryParams) => {

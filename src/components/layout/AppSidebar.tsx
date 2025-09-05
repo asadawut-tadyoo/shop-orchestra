@@ -10,6 +10,7 @@ import {
   Box,
   Home,
   LayoutDashboard,
+  Settings,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -28,6 +29,11 @@ const navigation = [
     title: 'Dashboard',
     href: '/',
     icon: LayoutDashboard,
+  },
+  {
+    title: 'Process Execution',
+    href: '/process-execution',
+    icon: Settings,
   },
   {
     title: 'Assembly Units',

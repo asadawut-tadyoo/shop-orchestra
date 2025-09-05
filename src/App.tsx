@@ -11,6 +11,7 @@ import BillOfMaterials from "./pages/BillOfMaterials";
 import NotFound from "./pages/NotFound";
 import RawMaterialScanForm from "./components/form/RawMaterialScanForm";
 import RMCheck from "./pages/RMCheck";
+import ProcessExecution from "./pages/ProcessExecution";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/stations" element={<Dashboard />} />
           <Route path="/bill-of-materials" element={<BillOfMaterials />} />
           <Route path="/process-steps" element={<Dashboard />} />
+          <Route path="/process-execution" element={<ProcessExecution />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
