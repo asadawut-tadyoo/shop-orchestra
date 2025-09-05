@@ -1,27 +1,37 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import PropTypes from "prop-types";
 type BarcodeFormProps = {
   label?: string;               // ข้อความ label แสดงเหนือช่อง input
   autoSubmit?: boolean;         // true = submit อัตโนมัติ, false = ต้องกดปุ่ม
   onSubmit: (barcode: string) => void;
+  isEnable?:boolean; 
+  valueCode:string;
+  onChangeCode: (value: string) => void;
 };
 
 const BarcodeForm: React.FC<BarcodeFormProps> = ({ 
   label = "Scan Barcode", 
   autoSubmit = true, 
-  onSubmit 
+  onSubmit,
+  isEnable = true,
+  valueCode = "",
+  onChangeCode
 }) => {
-  const [barcode, setBarcode] = useState("");
+  // const [barcode, setBarcode] = useState(valueCode);
+  // const [isClear, setIsClear] = useState(true);
+  // useEffect(() => {
+  //   setBarcode(valueCode); 
+  // }, [valueCode]);
 
   const handleSubmit = (e?: FormEvent) => {
     if (e) e.preventDefault();
-    if (barcode.trim() === "") return; // กันช่องว่าง
-    onSubmit(barcode);
+    if (valueCode.trim() === "") return; // กันช่องว่าง
+    onSubmit(valueCode);
     // setBarcode(""); // เคลียร์หลัง submit
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setBarcode(e.target.value);
+    onChangeCode(e.target.value);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -38,12 +48,13 @@ const BarcodeForm: React.FC<BarcodeFormProps> = ({
       <div className="flex items-center gap-2">
         <input
           type="text"
-          value={barcode}
+          value={valueCode}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder="Scan barcode here..."
           autoFocus
-          className="border border-gray-300 rounded p-2 flex-1"
+          className= "border border-gray-300 rounded p-2 flex-1"
+          disabled={!isEnable} 
         />
         {/* {!autoSubmit && (
           <button

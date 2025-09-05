@@ -79,12 +79,20 @@ export interface RawMaterial {
   lotNumber: string;
   batchNo: string;
   status: RawMaterialStatus;
+  assemblyUnitId: string;
   inspections: Inspection[];
   description?: string;
   quantity?: number;
   unit?: string;
   supplier?: string;
   receivedDate?: Date;
+}
+
+export interface ApiError {
+  title?: string;
+  status?: number;
+  detail: string;
+  instance?: string;
 }
 
 export interface AssemblyUnit {
@@ -108,9 +116,10 @@ export interface Batch {
   batchNo: string;
   productCode:string; 
   status: BatchStatus;
-  // workOrder: WorkOrder;
-  // plannedQuantity: number;
-  // actualQuantity: number;
+   workOrder: WorkOrder;
+   workOrderId :string;
+  plannedQuantity: number;
+  actualQuantity: number;
   startDate?: Date;
   endDate?: Date;
   description?: string;

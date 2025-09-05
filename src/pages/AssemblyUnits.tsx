@@ -5,7 +5,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { useAssemblyUnits, useDeleteAssemblyUnit } from '@/hooks/useApi';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
-import { AssemblyUnit } from '@/types';
+import { AssemblyUnit } from '@/types/index';
 import {
   AlertDialog,
   AlertDialogAction,

@@ -4,7 +4,7 @@ import {
   RawMaterialFormData, 
   PaginatedResponse, 
   QueryParams 
-} from '@/types';
+} from '@/types/index';
 
 const BASE_PATH = '/raw-materials';
 

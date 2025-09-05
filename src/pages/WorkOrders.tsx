@@ -5,7 +5,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { useWorkOrders, useDeleteWorkOrder } from '@/hooks/useApi';
 import { Plus, Edit, Trash2, Eye, AlertCircle } from 'lucide-react';
-import { WorkOrder } from '@/types';
+import { WorkOrder } from '@/types/index';
 import {
   AlertDialog,
   AlertDialogAction,

@@ -5,7 +5,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { useBatches, useDeleteBatch } from '@/hooks/useApi';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
-import { Batch } from '@/types';
+import { Batch } from '@/types/index';
 import {
   AlertDialog,
   AlertDialogAction,

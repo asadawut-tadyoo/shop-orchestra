@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 
 // Create axios instance with base configuration
 const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'https://localhost:7276/api',
+   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5068/',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
