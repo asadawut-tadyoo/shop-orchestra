@@ -11,6 +11,7 @@ import {
   Home,
   LayoutDashboard,
   Settings,
+  Cog,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -69,6 +70,11 @@ const navigation = [
     title: 'Process Steps',
     href: '/process-steps',
     icon: Activity,
+  },
+  {
+    title: 'Configurable Workflow',
+    href: '/configurable-workflow',
+    icon: Cog,
   },
 ];
 
