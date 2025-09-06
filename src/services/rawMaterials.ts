@@ -37,4 +37,20 @@ export const rawMaterialsService = {
     const { data } = await api.get(`${BASE_PATH}/batch/${batchNo}`);
     return data;
   },
+
+  // Get raw material by serial number
+  getBySerial: async (materialCode: string, serialNumber: string): Promise<RawMaterial> => {
+    const { data } = await api.get(`${BASE_PATH}/by-serial/${materialCode}/${serialNumber}`);
+    return data;
+  },
+
+  // Add inspection to raw material
+  addInspection: async (id: string, inspectionData: {
+    testType: string;
+    result: string;
+    measuredValue: string;
+    inspector: string;
+  }): Promise<void> => {
+    await api.post(`${BASE_PATH}/${id}/inspection`, inspectionData);
+  },
 };

@@ -2,11 +2,12 @@ import { ApiError, AssemblyUnit, RawMaterialStatus } from "@/types";
 import React, { useState } from "react";
 import BarcodeForm from "./BarcodeForm";
 import { assemblyUnitsService } from "@/services/assemblyUnits";
+import { rawMaterialsService } from "@/services/rawMaterials";
+import { stationsService } from "@/services/stations";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
-import axios from "axios";
 import ConfirmDialog from "../dialog/ConfirmDialog";
 type RawMaterialScanFormProps = {
   label?: string;
@@ -53,10 +54,8 @@ const RawMaterialScanForm: React.FC<RawMaterialScanFormProps> = ({
       const [materialCode, serialNumber] = barcode.split(":");
 
       // 1) ดึง RawMaterial ID
-      const rawMatRes = await axios.get(
-        `http://localhost:5068/api/RawMaterials/by-serial/${materialCode}/${serialNumber}`
-      );
-      const rawMatId = rawMatRes.data.id;
+      const rawMat = await rawMaterialsService.getBySerial(materialCode, serialNumber);
+      const rawMatId = rawMat.id;
 
       // 2) ส่ง Inspection
       const inspectionData = {
@@ -66,17 +65,13 @@ const RawMaterialScanForm: React.FC<RawMaterialScanFormProps> = ({
         inspector: "John Doe",
       };
 
-      await axios.post(
-        `http://localhost:5068/api/RawMaterials/${rawMatId}/inspection`,
-        inspectionData
-      );
+      await rawMaterialsService.addInspection(rawMatId, inspectionData);
 
       // 3) เปลี่ยนสถานะ RM → Consumed
-      const payload = { materialCode, serialNumber };
-      await axios.post(
-        `http://localhost:5068/api/AssemblyUnits/${assemblyUnit.id}/consume-rawmaterial`,
-        payload,
-        { headers: { "Content-Type": "application/json" } }
+      await assemblyUnitsService.consumeRawMaterial(
+        assemblyUnit.id,
+        materialCode,
+        serialNumber
       );
 
       // ✅ สำเร็จ → reset state + callback
@@ -86,20 +81,12 @@ const RawMaterialScanForm: React.FC<RawMaterialScanFormProps> = ({
       setCurrentMaterial(null);
 
       onAccept?.(); // เรียก parent callback ถ้ามีส่งมา
-    } catch (error) {
-      if (axios.isAxiosError<ApiError>(error)) {
-        setErrorDialog({
-          isLoading: false,
-          message: error.response?.data.detail ?? "Unexpected error",
-          isOpen: true,
-        });
-      } else {
-        setErrorDialog({
-          isLoading: false,
-          message: "Unknown error occurred",
-          isOpen: true,
-        });
-      }
+    } catch (error: any) {
+      setErrorDialog({
+        isLoading: false,
+        message: error.response?.data?.detail ?? "Unexpected error",
+        isOpen: true,
+      });
       toast.error("Failed to accept material");
 
       // reset form ให้กรอกใหม่
@@ -110,22 +97,20 @@ const RawMaterialScanForm: React.FC<RawMaterialScanFormProps> = ({
     try {
       // setTempMaterialCode(rawMatId.data.materialCode);
       // setTempSerialNumber(rawMatId.data.serialNumber);
-      const statusAssemUnit = await axios.get<AssemblyUnit>(
-        `http://localhost:5068/api/AssemblyUnits/${assemblyUnit.id}`
-      );
+      const statusAssemUnit = await assemblyUnitsService.getById(assemblyUnit.id);
       // statusAssemUnit.status === "Assembled" ? console.log("Assembly Unit Status:", "success") : console.log("No Assembly Unit Status found");
-      if (statusAssemUnit.data.status === "Assembled") {
+      if (statusAssemUnit.status === "Assembled") {
         stopProcess();
       } 
       onSubmit();
       setShowBarCodeForm(false);
       setIsEnableForm(true);
       setScannedBarcode("");
-    } catch (error) {
+    } catch (error: any) {
       toast.error("Failed to accept material");
       setErrorDialog({
         isLoading: false,
-        message: error.response?.data.detail,
+        message: error.response?.data?.detail ?? "Unknown error",
         isOpen: true,
       });
       return;
@@ -173,15 +158,13 @@ const RawMaterialScanForm: React.FC<RawMaterialScanFormProps> = ({
     let station;
     // const [tempStation, setTempStation] = useState<Station | null>(null);
     try {
-      const response = await axios.get("http://localhost:5068/api/Stations");
-      const stations = response.data as {
-        id: string;
-        name: string;
-        location: string;
-        stationType: string;
-      }[];
+      const stations = await stationsService.getAll();
       station = stations.find((s) => s.name === "MainAssembly1");
     } catch (error) { 
+      return;
+    }
+
+    if (!station) {
       return;
     }
 
@@ -191,45 +174,37 @@ const RawMaterialScanForm: React.FC<RawMaterialScanFormProps> = ({
         stationId: station.id,
         isOnProcess: false,
       };
-      await axios.post(
-        `http://localhost:5068/api/AssemblyUnits/${assemblyUnit.serialNumber}/add-processstep`,
+      await assemblyUnitsService.addProcessStep(
+        assemblyUnit.id,
         processStep
       );
-    } catch (error) {
-      console.log("Error fetching assemblyUnits:", error.toJSON());
+    } catch (error: any) {
+      console.log("Error fetching assemblyUnits:", error);
     }
   };
 
   const handleReject = async (barcode: string) => { 
 
     setIsProcessing(true);
-    let rawMatId;
+    let rawMat;
     try {
       const [materialCode, serialNumber] = barcode.split(":"); // ตัดค่าตามเครื่องหมาย :
-      const payload = {
-        materialCode,
-        serialNumber 
-      };
-      rawMatId = await axios.post(
-        `http://localhost:5068/api/RawMaterials/by-serial/${payload.materialCode}/${payload.serialNumber}`
-      );
-    } catch (error) {
+      rawMat = await rawMaterialsService.getBySerial(materialCode, serialNumber);
+    } catch (error: any) {
       setIsProcessing(false); 
-      if (axios.isAxiosError<ApiError>(error)) {
-        toast.error("Failed to accept material");
-        setErrorDialog({
-          isLoading: false,
-          message: error.response?.data.detail,
-          isOpen: true,
-        }); 
-      }
+      toast.error("Failed to reject material");
+      setErrorDialog({
+        isLoading: false,
+        message: error.response?.data?.detail ?? "Unknown error",
+        isOpen: true,
+      });
       return;
     }
     try {
       // Update material status to Scrapped
       // currentMaterial.status = RawMaterialStatus.Scrapped;
-      // setTempMaterialCode(rawMatId.data.materialCode);
-      // setTempSerialNumber(rawMatId.data.serialNumber);
+      // setTempMaterialCode(rawMat.materialCode);
+      // setTempSerialNumber(rawMat.serialNumber);
       const inspectionData = {
         testType: "Visual Check", // หรือค่าที่คุณต้องการ
         result: "Fail", // หรือ "Failed"
@@ -237,10 +212,7 @@ const RawMaterialScanForm: React.FC<RawMaterialScanFormProps> = ({
         inspector: "John Doe", // ชื่อผู้ตรวจสอบ
       };
 
-      await axios.post(
-        `http://localhost:5068/api/RawMaterials/${rawMatId.data.id}/inspection`,
-        inspectionData
-      );
+      await rawMaterialsService.addInspection(rawMat.id, inspectionData);
       setShowActions(true);
       // In a real scenario, you would call an API to update this
       // For now, we'll just update locally
@@ -252,13 +224,11 @@ const RawMaterialScanForm: React.FC<RawMaterialScanFormProps> = ({
       setShowActions(false);
       setCurrentMaterial(null);
     } catch (error: any) {
-      if (axios.isAxiosError<ApiError>(error)) {
-        setErrorDialog({
-          isLoading: false,
-          message: error.response?.data.detail ?? "Unknown error",
-          isOpen: true,
-        });
-      }
+      setErrorDialog({
+        isLoading: false,
+        message: error.response?.data?.detail ?? "Unknown error",
+        isOpen: true,
+      });
       return;
     } finally {
       setIsProcessing(false);
