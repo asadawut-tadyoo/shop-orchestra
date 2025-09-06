@@ -82,7 +82,7 @@ export function AppSidebar() {
   const location = useLocation();
 
   return (
-    <Sidebar className="border-r border-sidebar-border">
+    <Sidebar className="border-r border-sidebar-border z-30">
       <SidebarContent className="bg-sidebar">
         <SidebarGroup>
           <SidebarGroupLabel className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">

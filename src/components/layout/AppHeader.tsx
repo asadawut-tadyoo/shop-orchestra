@@ -22,7 +22,7 @@ export function AppHeader({ onMenuClick }: AppHeaderProps) {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-gradient-header sticky top-0 z-50">
+    <header className="h-16 border-b border-border bg-gradient-header sticky top-0 z-40">
       <div className="flex h-full items-center justify-between px-4">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="text-sidebar-foreground hover:bg-sidebar-hover" />

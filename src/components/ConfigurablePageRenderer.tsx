@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Layout } from '@/components/layout/Layout';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ArrowRight, Settings } from 'lucide-react';
 
 /**
@@ -13,6 +14,10 @@ import { ArrowRight, Settings } from 'lucide-react';
  */
 export default function ConfigurablePageRenderer() {
   const [activePageId, setActivePageId] = useState<string>(pageConfigurations[0]?.id || '');
+  
+  const handleNavigateToPage = (pageId: string) => {
+    setActivePageId(pageId);
+  };
 
   const renderPageContent = (config: PageConfig) => {
     const Component = config.component;
@@ -29,10 +34,20 @@ export default function ConfigurablePageRenderer() {
             )}
           </div>
           {config.workflow?.nextPage && (
-            <Badge variant="outline" className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const nextConfig = pageConfigurations.find(c => c.id === config.workflow?.nextPage);
+                if (nextConfig) {
+                  setActivePageId(nextConfig.id);
+                }
+              }}
+              className="flex items-center gap-2"
+            >
               Next: {config.workflow.nextPage}
               <ArrowRight className="h-3 w-3" />
-            </Badge>
+            </Button>
           )}
         </div>
         
