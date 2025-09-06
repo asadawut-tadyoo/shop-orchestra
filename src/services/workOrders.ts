@@ -6,7 +6,7 @@ import {
   QueryParams 
 } from '@/types/index';
 
-const BASE_PATH = '/work-orders';
+const BASE_PATH = '/WorkOrders';
 
 export const workOrdersService = {
   getAll: async (params?: QueryParams): Promise<PaginatedResponse<WorkOrder>> => {
@@ -35,6 +35,12 @@ export const workOrdersService = {
 
   updateStatus: async (id: string, status: string): Promise<WorkOrder> => {
     const { data } = await api.patch(`${BASE_PATH}/${id}/status`, { status });
+    return data;
+  },
+
+  // Get work order by number
+  getByNumber: async (workOrderNo: string): Promise<WorkOrder> => {
+    const { data } = await api.get(`${BASE_PATH}/${workOrderNo}`);
     return data;
   },
 };

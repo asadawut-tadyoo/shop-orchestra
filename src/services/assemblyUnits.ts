@@ -68,4 +68,10 @@ export const assemblyUnitsService = {
   changeStatus: async (id: string, status: string): Promise<void> => {
     await api.post(`${BASE_PATH}/${id}/change-status`, { status });
   },
+
+  // Add process step to assembly unit
+  addProcessStep: async (id: string, processStep: { name: string; stationId: string; isOnProcess: boolean }): Promise<AssemblyUnit> => {
+    const { data } = await api.post(`${BASE_PATH}/${id}/add-processstep`, processStep);
+    return data;
+  },
 };

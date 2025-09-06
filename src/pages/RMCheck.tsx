@@ -1,25 +1,23 @@
-import { useEffect, useState } from "react";
-import { Layout } from "@/components/layout/Layout";
-import { useRawMaterials } from "@/hooks/useApi";
+import { useState } from "react";
 import BarcodeForm from "@/components/form/BarcodeForm";
-import axios from "axios";
 import RawMaterialScanForm from "@/components/form/RawMaterialScanForm";
-import { ApiError, AssemblyUnit, AssemblyUnitStatus, RawMaterialStatus, Station } from "@/types";
+import { AssemblyUnit } from "@/types";
 import { assemblyUnitsService } from "@/services/assemblyUnits";
+import { workOrdersService } from "@/services/workOrders";
+import { stationsService } from "@/services/stations";
 import { Card } from "@/components/ui/card";
-import ConfirmDialog from "@/components/dialog/ConfirmDialog";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RMCheckForm() {
   const [barcode, setBarcode] = useState<string>("");
-  const [showCustomerBarcode, setShowCustomerBarcode] =
-    useState<boolean>(false);
+  const [showCustomerBarcode, setShowCustomerBarcode] = useState<boolean>(false);
   const [assemblyUnit, setAssemblyUnit] = useState<AssemblyUnit | null>(null);
-
+  const { toast } = useToast();
+  
   const resetState = () => {
     setBarcode("");
     setShowCustomerBarcode(false);
-  }; 
+  };
 
   const [errorDialog, setErrorDialog] = useState<{
       isOpen: boolean; 
@@ -107,88 +105,63 @@ export default function RMCheckForm() {
   //   updatedAt: new Date("2025-09-01T12:00:00Z")
   // }]
   const handleSummitCusCode = async (barcode: string) => {
-    let station;
-    // const [tempStation, setTempStation] = useState<Station | null>(null);
     try {
-      const response = await axios.get("http://localhost:5068/api/Stations");
-      const stations = response.data as {
-        id: string;
-        name: string;
-        location: string;
-        stationType: string;
-      }[];
-      station = stations.find((s) => s.name === "MainAssembly1");
-    } catch (error) {
-      if (axios.isAxiosError<ApiError>(error)) {
-        setErrorDialog({
-          isLoading: false,
-          message: error.response?.data.detail ?? "Unexpected error",
-          isOpen: true,
+      // Parse the barcode to extract work order number and serial number
+      const [workOrderNo, serialNumber] = barcode.split(":");
+      
+      if (!workOrderNo || !serialNumber) {
+        toast({
+          title: "Invalid barcode format",
+          description: "Barcode should be in format: WorkOrderNo:SerialNumber",
+          variant: "destructive"
         });
-      } else {
-        setErrorDialog({
-          isLoading: false,
-          message: "Unknown error occurred",
-          isOpen: true,
-        });
+        return;
       }
-      toast.error("Failed to accept material");
-      return;
-    }
-    let assemblyUnitId;
 
-    try {
-      assemblyUnitId = await axios.get<AssemblyUnit>(
-        `http://localhost:5068/api/AssemblyUnits/by-serial/${barcode}`
-      );
-    } catch (error) {
-       if (axios.isAxiosError<ApiError>(error)) {
-        setErrorDialog({
-          isLoading: false,
-          message: error.response?.data.detail ?? "Unexpected error",
-          isOpen: true,
+      // Get work order by number
+      const workOrder = await workOrdersService.getByNumber(workOrderNo);
+      
+      // Get assembly unit by serial number
+      const assemblyUnit = await assemblyUnitsService.getBySerial(workOrder.id, serialNumber);
+      
+      // Get stations and find MainAssembly1
+      const stationsResponse = await stationsService.getAll();
+      const station = stationsResponse.data?.find(s => s.name === "MainAssembly1");
+      
+      if (!station) {
+        toast({
+          title: "Station not found",
+          description: "MainAssembly1 station not found",
+          variant: "destructive"
         });
-      } else {
-        setErrorDialog({
-          isLoading: false,
-          message: "Unknown error occurred",
-          isOpen: true,
-        });
+        return;
       }
-      toast.error("Failed to accept material");
-      return; 
-    }
-    try {
+
+      // Add process step to assembly unit
       const processStep = {
         name: "product_01",
         stationId: station.id,
         isOnProcess: true,
       };
-      const response = await axios.post(
-        `http://localhost:5068/api/AssemblyUnits/${assemblyUnitId.data.id}/add-processstep`,
+      
+      const updatedAssemblyUnit = await assemblyUnitsService.addProcessStep(
+        assemblyUnit.id,
         processStep
       );
-
-      console.log("Response:", response.data);
-      const assemblyUnit: AssemblyUnit = response.data;
-      setAssemblyUnit(assemblyUnit);
+      
+      setAssemblyUnit(updatedAssemblyUnit);
       setShowCustomerBarcode(true);
-    } catch (error) {
-      if (axios.isAxiosError<ApiError>(error)) {
-        setErrorDialog({
-          isLoading: false,
-          message: error.response?.data.detail ?? "Unexpected error",
-          isOpen: true,
-        });
-      } else {
-        setErrorDialog({
-          isLoading: false,
-          message: "Unknown error occurred",
-          isOpen: true,
-        });
-      }
-      toast.error("Failed to accept material");
-      return;
+      
+      toast({
+        title: "Accept SerialNumber",
+        description: "Process step added successfully"
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to submit code",
+        description: error.response?.data?.detail || error.message || "Unexpected error",
+        variant: "destructive"
+      });
     }
   };
 
@@ -204,16 +177,8 @@ export default function RMCheckForm() {
   // };
 
   return (
-    <Layout>
+    <>
       <div className="p-6 space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold">Raw Material Check</h1>
-          <p className="text-muted-foreground mt-1">
-            {/* Real-time overview of production activities */}
-          </p>
-        </div>
-
         <div className="">
           <Card className="p-6 hover:shadow-lg transition-shadow">
             <div className="p-0 ">
@@ -224,28 +189,18 @@ export default function RMCheckForm() {
                   valueCode={barcode}
                   onSubmit={handleSummitCusCode}
                   onChangeCode={setBarcode}
-                ></BarcodeForm>
+                />
               ) : (
                 <RawMaterialScanForm
                   assemblyUnit={assemblyUnit}
                   onSubmit={() => setShowCustomerBarcode(false)}
                   onAccept={resetState}
-                ></RawMaterialScanForm>
+                />
               )}
             </div>
           </Card>
         </div>
       </div>
-
-        {errorDialog.isOpen && (
-        <ConfirmDialog
-          isOpen={errorDialog.isOpen}
-          message={errorDialog.message} 
-          title='Error'
-          onCancel={()=> setErrorDialog({isOpen:false, isLoading:true})}
-          isLoading={errorDialog.isLoading}
-        ></ConfirmDialog>
-      )}
-    </Layout>
+    </>
   );
 }

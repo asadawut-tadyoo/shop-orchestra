@@ -6,7 +6,7 @@ import {
   QueryParams 
 } from '@/types/index';
 
-const BASE_PATH = '/stations';
+const BASE_PATH = '/Stations';
 
 export const stationsService = {
   getAll: async (params?: QueryParams): Promise<PaginatedResponse<Station>> => {
