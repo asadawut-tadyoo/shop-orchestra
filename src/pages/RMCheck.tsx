@@ -125,8 +125,8 @@ export default function RMCheckForm() {
       const assemblyUnit = await assemblyUnitsService.getBySerial(workOrder.id, serialNumber);
       
       // Get stations and find MainAssembly1
-      const stationsResponse = await stationsService.getAll();
-      const station = stationsResponse.data?.find(s => s.name === "MainAssembly1");
+      const stations = await stationsService.getAll();
+      const station = stations.find(s => s.name === "MainAssembly1");
       
       if (!station) {
         toast({

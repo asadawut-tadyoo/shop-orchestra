@@ -9,9 +9,9 @@ import {
 const BASE_PATH = '/Stations';
 
 export const stationsService = {
-  getAll: async (params?: QueryParams): Promise<PaginatedResponse<Station>> => {
-    const { data } = await api.get(BASE_PATH, { params });
-    return data;
+  getAll: async (params?: QueryParams): Promise<Station[]> => {
+    const { data } = await api.get<Station[]>(BASE_PATH, { params });
+    return data || [];
   },
 
   getById: async (id: string): Promise<Station> => {
